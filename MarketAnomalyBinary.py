@@ -2,7 +2,9 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from xgboost import XGBClassifier #Another model which gives more accuracy and recall compared to LogisticRegression
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+import pickle #For the later use 
 
 # Provide the path to your CSV file
 file_path = "C:/Users/Tange/Downloads/HeadStarterProject/MABData.csv"
@@ -19,7 +21,7 @@ print("Missing Values ;\n", X.isnull().sum().sum())
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 42)
 
 #use logisitc regression model
-model = LogisticRegression(max_iter = 1000, random_state = 42)
+model = LogisticRegression(max_iter = 1000, random_state = 42 )
 model.fit(X_train, y_train)
 
 # Make predictions
@@ -33,6 +35,22 @@ print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
 # Calculate AUC-ROC Score
 auc_score = roc_auc_score(y_test, y_pred_proba)
 print("AUC-ROC Score:", auc_score)
+
+#xgboost model
+xgb_model = XGBClassifier(random_state=42)
+model.fit(X_train,y_train)
+model_predictions = model.predict(X_test)
+model_accuracy = auc_score(y_test,model_predictions)
+print(f"{model.__class__.__name__} Accuracy : {model_accuracy:.4f}")
+print(f"\nClassification Report :\n {classification_report(y_test,model_predictions)}")
+
+
+with open(xgb_model.pkl, "wb") as file:
+    pickle.dump(model,file)
+
+print(f"model saved as {xgb_model.pkl}")
+print("*************************************************\n\n")
+
 
 # Step 4: Analyze feature importance
 feature_importance = pd.DataFrame({
